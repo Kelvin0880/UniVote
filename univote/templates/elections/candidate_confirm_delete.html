@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Candidato - UniVote{% endblock %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-header bg-danger text-white">
+        <h3 class="mb-0">Confirmar eliminación</h3>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+        </div>
+        
+        <p>¿Estás seguro de que deseas eliminar al candidato <strong>"{{ candidate.name }}"</strong> de la elección "{{ candidate.election.title }}"?</p>
+        <p>Si ya hay votos asociados a este candidato, también se eliminarán.</p>
+        
+        {% if candidate.photo %}
+        <div class="text-center mb-3">
+            <img src="{{ candidate.photo.url }}" alt="{{ candidate.name }}" class="img-thumbnail" style="max-height: 200px;">
+        </div>
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'election_detail' candidate.election.id %}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt me-2"></i>Sí, eliminar candidato
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

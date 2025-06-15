@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resultados: {{ election.title }} - UniVote{% endblock %}
+
+{% block extra_css %}
+<style>
+    .results-header {
+        background: linear-gradient(135deg, var(--unphu-green), var(--unphu-dark));
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .result-card {
+        transition: transform 0.3s;
+    }
+
+    .result-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .result-bar-container {
+        height: 25px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        overflow: hidden;
+    }
+
+    .result-bar {
+        height: 100%;
+        background-color: var(--unphu-green);
+        color: white;
+        text-align: right;
+        padding-right: 10px;
+        line-height: 25px;
+        font-weight: bold;
+        transition: width 1s ease-in-out;
+        width: var(--bar-width, 0%);
+    }
+    
+    .candidate-result-photo {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid var(--unphu-green);
+    }
+    
+    .winner-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: gold;
+        color: #333;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: bold;
+        z-index: 10;
+    }
+
+    .no-votes-message {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-left: 4px solid var(--unphu-green);
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .preview-notice {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .results-summary {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 4px solid var(--unphu-green);
+    }
+
+    .results-summary h5 {
+        color: var(--unphu-green);
+        margin-bottom: 15px;
+    }
+
+    .summary-stat {
+        text-align: center;
+        padding: 15px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .summary-stat h3 {
+        color: var(--unphu-green);
+        margin-bottom: 5px;
+    }
+
+    .summary-stat p {
+        margin-bottom: 0;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'election_detail' election.id %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Volver a la elección
+    </a>
+    {% if user.role == 'ADMIN' %}
+    <a href="{% url 'result_dashboard' %}" class="btn btn-outline-primary ms-2">
+        <i class="fas fa-tachometer-alt me-2"></i>Ir al dashboard
+    </a>
+    {% endif %}
+</div>
+
+{% if not election.has_ended %}
+<div class="preview-notice">
+    <div class="d-flex align-items-center">
+        <div class="flex-shrink-0">
+            <i class="fas fa-info-circle fa-2x me-3"></i>
+        </div>
+        <div>
+            <h5 class="mb-1">Vista previa de resultados</h5>
+            <p class="mb-0">Esta elección aún está en curso. Los resultados mostrados son preliminares y pueden cambiar hasta que la elección finalice el {{ election.end_date|date:"d/m/Y" }} a las {{ election.end_date|date:"H:i" }}.</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="results-header">
+    <div class="container">
+        <h1 class="text-white">Resultados: {{ election.title }}</h1>
+        <p class="lead text-white">{{ election.description|truncatechars:150 }}</p>
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="fas fa-calendar-alt fa-2x text-white"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 text-white">Período de votación</h6>
+                        <p class="mb-0 text-white">{{ election.start_date|date:"d/m/Y H:i" }} - {{ election.end_date|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="fas fa-users fa-2x text-white"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 text-white">Participación</h6>
+                        <p class="mb-0 text-white"><strong>{{ total_votes }}</strong> votos emitidos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="fas fa-medal fa-2x text-white"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 text-white">Candidatos</h6>
+                        <p class="mb-0 text-white">{{ candidates|length }} participantes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resumen de resultados -->
+{% if total_votes > 0 %}
+<div class="results-summary">
+    <h5><i class="fas fa-chart-bar me-2"></i>Resumen de resultados</h5>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="summary-stat">
+                <h3>{{ total_votes }}</h3>
+                <p>Total de votos</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="summary-stat">
+                <h3>{{ candidates|length }}</h3>
+                <p>Candidatos</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="summary-stat">
+                {% if candidates %}
+                <h3>{{ candidates.0.percentage|floatformat:1 }}%</h3>
+                <p>Mayor porcentaje</p>
+                {% else %}
+                <h3>0%</h3>
+                <p>Mayor porcentaje</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="summary-stat">
+                <h3>{% if election.has_ended %}Finalizada{% else %}En curso{% endif %}</h3>
+                <p>Estado</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="card mb-4 shadow">
+    <div class="card-header bg-unphu text-white">
+        <h2 class="h5 mb-0">Resultados detallados</h2>
+    </div>
+    <div class="card-body">
+        {% if total_votes > 0 %}
+            <div class="d-flex justify-content-end mb-4">
+                <div class="btn-group" role="group">
+                    <a href="{% url 'election_results_pdf' election.id %}" class="btn btn-danger">
+                        <i class="fas fa-file-pdf me-1"></i> Descargar PDF
+                    </a>
+                    <a href="{% url 'election_results_export' election.id %}" class="btn btn-success">
+                        <i class="fas fa-file-csv me-1"></i> Exportar CSV
+                    </a>
+                </div>
+            </div>
+            
+            <div class="row">
+                {% for candidate in candidates %}
+                <div class="col-md-6 mb-4">
+                    <div class="card result-card h-100 position-relative shadow-sm">
+                        {% if forloop.first and election.has_ended %}
+                        <div class="winner-badge">
+                            <i class="fas fa-trophy me-1"></i> Ganador
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                {% if candidate.photo %}
+                                <img src="{{ candidate.photo.url }}" alt="{{ candidate.name }}" class="candidate-result-photo me-3">
+                                {% else %}
+                                <div class="candidate-result-photo me-3 d-flex align-items-center justify-content-center bg-light">
+                                    <i class="fas fa-user fa-2x text-secondary"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <h5 class="card-title mb-0 text-dark">{{ candidate.name }}</h5>
+                                    <p class="card-text text-muted">{{ candidate.position }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="result-bar-container">
+                                <div class="result-bar" style="--bar-width: {{ candidate.percentage|floatformat:2 }}%">
+                                    {% if candidate.percentage > 5 %}
+                                        {{ candidate.percentage|floatformat:2 }}%
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between text-dark">
+                                <span><strong>{{ candidate.votes_count }}</strong> votos</span>
+                                <span><strong>{{ candidate.percentage|floatformat:2 }}%</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-votes-message">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle fa-2x me-3 text-unphu"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1 text-dark">Sin votos registrados</h5>
+                        <p class="mb-0 text-dark">Aún no se han registrado votos para esta elección. Los resultados estarán disponibles una vez que los estudiantes comiencen a votar.</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

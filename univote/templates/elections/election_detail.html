@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ election.title }} - UniVote{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'election_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Volver a elecciones
+    </a>
+</div>
+
+<div class="card mb-4 shadow">
+    <div class="card-header election-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="h4 mb-0">{{ election.title }}</h2>
+            <div>
+                {% if election.is_ongoing %}
+                <span class="badge bg-success"><i class="fas fa-running me-1"></i> En curso</span>
+                {% elif election.has_ended %}
+                <span class="badge bg-secondary"><i class="fas fa-flag-checkered me-1"></i> Finalizada</span>
+                {% else %}
+                <span class="badge" style="background-color: var(--unphu-accent); color: #333;"><i class="fas fa-hourglass-start me-1"></i> Próximamente</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="election-description">
+                    <h5><i class="fas fa-info-circle me-2 text-unphu"></i>Descripción:</h5>
+                    <p>{{ election.description }}</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="election-details">
+                    <h5><i class="fas fa-clipboard-list me-2 text-unphu"></i>Detalles:</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="far fa-calendar-plus me-2"></i> Fecha de inicio:</span>
+                            <span class="badge bg-unphu-light text-unphu">{{ election.start_date|date:"d/m/Y H:i" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="far fa-calendar-check me-2"></i> Fecha de fin:</span>
+                            <span class="badge bg-unphu-light text-unphu">{{ election.end_date|date:"d/m/Y H:i" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-toggle-on me-2"></i> Estado:</span> 
+                            {% if election.is_active %}
+                            <span class="badge bg-success">Activa</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactiva</span>
+                            {% endif %}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-user-shield me-2"></i> Creada por:</span>
+                            <span>{{ election.created_by.first_name }} {{ election.created_by.last_name }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones para administradores -->
+        {% if user.is_authenticated and user.role == 'ADMIN' %}
+        <div class="mb-4 admin-actions">
+            <h5><i class="fas fa-tools me-2 text-unphu"></i>Acciones de administrador:</h5>
+            <div class="btn-group" role="group">
+                <a href="{% url 'election_edit' election.id %}" class="btn btn-warning">
+                    <i class="fas fa-edit me-1"></i> Editar elección
+                </a>
+                <a href="{% url 'election_delete' election.id %}" class="btn btn-danger">
+                    <i class="fas fa-trash-alt me-1"></i> Eliminar
+                </a>
+                {% if election.has_ended %}
+                <a href="{% url 'election_results' election.id %}" class="btn btn-success">
+                    <i class="fas fa-chart-pie me-1"></i> Ver resultados
+                </a>
+                {% endif %}
+                <a href="{% url 'candidate_create' %}" class="btn btn-primary">
+                    <i class="fas fa-user-plus me-1"></i> Añadir candidato
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Sección de votación -->
+        <div class="mt-4">
+            <h3 class="h5 mb-3 section-title">Candidatos</h3>
+            
+            {% if user.is_authenticated and election.is_ongoing and not user_has_voted %}
+            <div class="alert alert-primary mb-3">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-bullhorn fa-2x me-3"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading">¡Puedes votar ahora!</h5>
+                        <p class="mb-0">Tu voto es importante para esta elección. Participa en el proceso democrático de tu universidad.</p>
+                        <a href="{% url 'vote' election.id %}" class="btn btn-unphu mt-2">
+                            <i class="fas fa-vote-yea me-1"></i> Votar ahora
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% elif user.is_authenticated and user_has_voted %}
+            <div class="alert alert-success mb-3">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle fa-2x me-3"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading">¡Voto emitido!</h5>
+                        <p class="mb-0">Ya has participado en esta elección. Gracias por tu contribución al proceso democrático.</p>
+                        {% if election.has_ended %}
+                        <a href="{% url 'election_results' election.id %}" class="btn btn-outline-success mt-2">
+                            <i class="fas fa-chart-pie me-1"></i> Ver resultados
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% elif user.is_authenticated and not election.is_ongoing %}
+            <div class="alert alert-secondary mb-3">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-clock fa-2x me-3"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        {% if election.has_ended %}
+                        <h5 class="alert-heading">Elección finalizada</h5>
+                        <p class="mb-0">Esta elección ha concluido. Puedes consultar los resultados.</p>
+                        <a href="{% url 'election_results' election.id %}" class="btn btn-outline-secondary mt-2">
+                            <i class="fas fa-chart-pie me-1"></i> Ver resultados
+                        </a>
+                        {% else %}
+                        <h5 class="alert-heading">Elección próximamente</h5>
+                        <p class="mb-0">Esta elección aún no ha comenzado. Podrás votar cuando inicie el {{ election.start_date|date:"d/m/Y" }} a las {{ election.start_date|date:"H:i" }}.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% elif not user.is_authenticated %}
+            <div class="alert alert-info mb-3">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-user-lock fa-2x me-3"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading">Autenticación requerida</h5>
+                        <p class="mb-0">Debes iniciar sesión con tu cuenta institucional para participar en esta elección.</p>
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary mt-2">
+                            <i class="fas fa-sign-in-alt me-1"></i> Iniciar sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if candidates %}
+            <div class="row candidates-container">
+                {% for candidate in candidates %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 candidate-card shadow-sm">
+                        <div class="card-body text-center">
+                            {% if candidate.photo %}
+                            <img src="{{ candidate.photo.url }}" alt="{{ candidate.name }}" class="candidate-photo">
+                            {% else %}
+                            <div class="candidate-photo-placeholder">
+                                <i class="fas fa-user fa-4x text-secondary"></i>
+                            </div>
+                            {% endif %}
+                            <h5 class="card-title">{{ candidate.name }}</h5>
+                            <p class="card-subtitle mb-2 text-muted">{{ candidate.position }}</p>
+                            <div class="candidate-divider my-3"></div>
+                            {% if candidate.bio %}
+                            <p class="card-text">{{ candidate.bio|truncatechars:100 }}</p>
+                            {% endif %}
+                            
+                            {% if user.is_authenticated and user.role == 'ADMIN' %}
+                            <div class="mt-3 pt-3 border-top">
+                                <a href="{% url 'candidate_edit' candidate.id %}" class="btn btn-sm btn-outline-warning mx-1">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <a href="{% url 'candidate_delete' candidate.id %}" class="btn btn-sm btn-outline-danger mx-1">
+                                    <i class="fas fa-trash-alt"></i> Eliminar
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading">Sin candidatos</h5>
+                        <p class="mb-0">Aún no hay candidatos registrados para esta elección.</p>
+                        {% if user.is_authenticated and user.role == 'ADMIN' %}
+                        <a href="{% url 'candidate_create' %}" class="btn btn-warning mt-2">
+                            <i class="fas fa-plus-circle me-1"></i> Añadir candidato
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .candidate-photo-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        border: 4px solid var(--unphu-green);
+    }
+    
+    .candidate-divider {
+        width: 40px;
+        height: 3px;
+        background-color: var(--unphu-green);
+        margin: 15px auto;
+    }
+    
+    .election-header {
+        background: linear-gradient(90deg, var(--unphu-green), var(--unphu-dark));
+        color: white;
+    }
+    
+    .admin-actions {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid var(--unphu-green);
+    }
+</style>
+{% endblock %}

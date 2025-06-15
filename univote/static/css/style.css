@@ -1,0 +1,362 @@
+/* Estilos personalizados para UniVote */
+
+:root {
+    --unphu-green: #005C30; /* Verde UNPHU principal */
+    --unphu-dark: #004120;  /* Verde UNPHU oscuro */
+    --unphu-light: #e6f0eb; /* Verde UNPHU claro */
+    --unphu-accent: #FFBB00; /* Color acento UNPHU (dorado) */
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --light-color: #ecf0f1;
+    --dark-color: #34495e;
+    --gray-bg: #f8f9fa;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: var(--gray-bg);
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Colores institucionales UNPHU */
+.bg-unphu {
+    background-color: var(--unphu-green) !important;
+}
+
+.bg-unphu-dark {
+    background-color: var(--unphu-dark) !important;
+}
+
+.bg-unphu-light {
+    background-color: var(--unphu-light) !important;
+}
+
+.text-unphu {
+    color: var(--unphu-green) !important;
+}
+
+.btn-unphu {
+    background-color: var(--unphu-green);
+    border-color: var(--unphu-green);
+    color: white;
+}
+
+.btn-unphu:hover {
+    background-color: var(--unphu-dark);
+    border-color: var(--unphu-dark);
+    color: white;
+}
+
+.btn-outline-unphu {
+    color: var(--unphu-green);
+    border-color: var(--unphu-green);
+}
+
+.btn-outline-unphu:hover {
+    background-color: var(--unphu-green);
+    color: white;
+}
+
+/* Estilos de encabezado */
+.navbar-dark.bg-primary {
+    background-color: var(--unphu-green) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Estilos de tarjetas */
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: var(--unphu-green);
+    color: white;
+    font-weight: 600;
+    padding: 15px 20px;
+}
+
+/* Estilos para botones */
+.btn-primary {
+    background-color: var(--unphu-green);
+    border-color: var(--unphu-green);
+}
+
+.btn-primary:hover {
+    background-color: var(--unphu-dark);
+    border-color: var(--unphu-dark);
+}
+
+.btn-accent {
+    background-color: var(--unphu-accent);
+    border-color: var(--unphu-accent);
+    color: white;
+}
+
+.btn-accent:hover {
+    background-color: #e09c00;
+    border-color: #e09c00;
+    color: white;
+}
+
+/* Estilos para la página de inicio */
+.hero-section {
+    background: linear-gradient(135deg, var(--unphu-green), var(--unphu-dark));
+    padding: 60px 0;
+    color: white;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Estilos para las tarjetas de características */
+.feature-card {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+}
+
+.feature-icon {
+    height: 80px;
+    width: 80px;
+    background-color: var(--unphu-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.feature-icon i {
+    color: var(--unphu-green);
+}
+
+/* Estilos para estadísticas */
+.stat-box {
+    padding: 20px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+/* Estilos para candidatos */
+.candidate-card {
+    text-align: center;
+    border: none;
+}
+
+.candidate-photo {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid var(--unphu-green);
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Banner informativo */
+.info-banner {
+    background-color: var(--unphu-light);
+    border-radius: 15px;
+    border-left: 5px solid var(--unphu-green);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* Estilos para la página de resultados */
+.result-bar {
+    height: 25px;
+    background-color: var(--unphu-green);
+    border-radius: 5px;
+    transition: width 0.5s;
+}
+
+/* Secciones */
+.section-title {
+    position: relative;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+    color: var(--unphu-dark);
+    font-weight: 600;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background-color: var(--unphu-green);
+}
+
+/* Tarjetas de elecciones */
+.election-card {
+    transition: all 0.3s ease;
+}
+
+.election-card:hover {
+    border-color: var(--unphu-green);
+}
+
+.election-card .card-header {
+    background-color: white;
+    color: var(--dark-color);
+    border-bottom: 2px solid var(--unphu-light);
+}
+
+/* Footer */
+footer {
+    background-color: var(--unphu-dark);
+    color: white;
+    padding: 30px 0;
+    margin-top: 50px;
+}
+
+footer h5 {
+    color: var(--unphu-accent);
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+footer .footer-links {
+    list-style: none;
+    padding-left: 0;
+}
+
+footer .footer-links li {
+    margin-bottom: 10px;
+}
+
+footer .footer-links a {
+    color: #e0e0e0;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+footer .footer-links a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+footer .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+footer .social-icons a {
+    color: white;
+    margin-right: 15px;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+footer .social-icons a:hover {
+    color: var(--unphu-accent);
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 30px 0;
+    }
+    
+    .candidate-photo {
+        width: 100px;
+        height: 100px;
+    }
+
+    .footer-column {
+        margin-bottom: 30px;
+    }
+}
+
+/* Animaciones */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Badges personalizados */
+.badge-active {
+    background-color: #2ecc71;
+}
+
+.badge-ended {
+    background-color: #7f8c8d;
+}
+
+.badge-upcoming {
+    background-color: var(--unphu-accent);
+}
+
+/* Avatar de usuario */
+.avatar-circle {
+    width: 100px;
+    height: 100px;
+    background-color: var(--unphu-green);
+    text-align: center;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.initials {
+    position: relative;
+    font-size: 40px;
+    line-height: 100px;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Mejorar votación */
+.candidates-grid {
+    gap: 20px !important;
+}
+
+.candidate-option {
+    border: 2px solid #eaeaea;
+    transition: all 0.3s ease !important;
+}
+
+.candidate-option:hover {
+    border-color: var(--unphu-green) !important;
+}
+
+input[type="radio"]:checked + strong {
+    color: var(--unphu-green) !important;
+}

@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}UniVote - Inicio{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center p-5 fade-in">
+    <h1 class="display-4">Bienvenido a UniVote</h1>
+    <p class="lead">
+        Sistema de votación seguro para la Universidad Nacional Pedro Henríquez Ureña
+    </p>
+    {% if not user.is_authenticated %}
+    <div class="mt-4">
+        <a href="{% url 'login' %}" class="btn btn-light btn-lg me-2">Iniciar Sesión</a>
+        <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg">Registrarse</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center shadow-sm feature-card">
+                <div class="card-body">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-vote-yea fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Vota de forma segura</h5>
+                    <p class="card-text">
+                        Participa en las elecciones estudiantiles de forma rápida y segura desde cualquier dispositivo.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center shadow-sm feature-card">
+                <div class="card-body">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-shield-alt fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Autenticación segura</h5>
+                    <p class="card-text">
+                        Acceso exclusivo para miembros de la comunidad universitaria con correo institucional.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center shadow-sm feature-card">
+                <div class="card-body">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-chart-bar fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Resultados en tiempo real</h5>
+                    <p class="card-text">
+                        Visualiza los resultados de las votaciones de manera clara y transparente una vez finalizadas.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas - Solo para administradores -->
+    {% if user.is_authenticated and user.role == 'ADMIN' %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Estadísticas del sistema</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-box bg-unphu-light">
+                                <h1 class="display-4 text-unphu">{{ total_users }}</h1>
+                                <p class="mb-0">Usuarios registrados</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-box bg-unphu-light">
+                                <h1 class="display-4 text-unphu">{{ total_elections }}</h1>
+                                <p class="mb-0">Elecciones creadas</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-box bg-unphu-light">
+                                <h1 class="display-4 text-unphu">{{ total_votes }}</h1>
+                                <p class="mb-0">Votos emitidos</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-box bg-unphu-light">
+                                <h1 class="display-4 text-unphu">
+                                    {% if total_users > 0 %}
+                                        {{ total_votes|floatformat:0 }}%
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                </h1>
+                                <p class="mb-0">Participación</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if ongoing_elections %}
+    <!-- Elecciones en curso -->
+    <div class="mt-5">
+        <h2 class="section-title">Elecciones en curso</h2>
+        <div class="row">
+            {% for election in ongoing_elections %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm election-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ election.title }}</h5>
+                        <span class="badge bg-success">En curso</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ election.description|truncatechars:100 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="small text-muted mb-0">
+                                <i class="far fa-clock me-1"></i> Finaliza: {{ election.end_date|date:"d/m/Y H:i" }}
+                            </p>
+                            <a href="{% url 'election_detail' election.id %}" class="btn btn-outline-unphu">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Banner informativo -->
+    <div class="info-banner mt-5 text-center p-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h3>Tu voto cuenta</h3>
+                <p class="mb-0">Participa activamente en las decisiones de tu universidad. La democracia estudiantil fortalece nuestra comunidad.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="{% url 'election_list' %}" class="btn btn-unphu">Ver todas las elecciones</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

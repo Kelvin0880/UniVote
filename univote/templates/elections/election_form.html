@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if is_create %}Crear Nueva Elección{% else %}Editar Elección{% endif %} - UniVote
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .datetime-help {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% if is_create %}{% url 'election_list' %}{% else %}{% url 'election_detail' election.id %}{% endif %}" class="btn btn-outline-unphu">
+        <i class="fas fa-arrow-left me-2"></i>Volver
+    </a>
+</div>
+
+<div class="card shadow">
+    <div class="card-header bg-unphu text-white">
+        <h3 class="mb-0">{% if is_create %}Crear Nueva Elección{% else %}Editar Elección{% endif %}</h3>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form.title|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form.description|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form.start_date|as_crispy_field }}
+                    <p class="datetime-help">Formato: YYYY-MM-DD HH:MM</p>
+                </div>
+                <div class="col-md-6">
+                    {{ form.end_date|as_crispy_field }}
+                    <p class="datetime-help">Formato: YYYY-MM-DD HH:MM</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-check mb-3">
+                        {{ form.is_active }}
+                        <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                            ¿Elección activa?
+                        </label>
+                        <small class="form-text text-muted d-block">
+                            Las elecciones inactivas no serán visibles para los usuarios regulares.
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-unphu">
+                    {% if is_create %}Crear Elección{% else %}Guardar Cambios{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

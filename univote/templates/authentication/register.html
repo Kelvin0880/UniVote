@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Registro - UniVote{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-unphu text-white">
+                <h3 class="mb-0">Registro de usuario</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.first_name|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.last_name|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.student_id|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.password1|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.password2|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-unphu">Registrarse</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3">
+                    <p>¿Ya tienes una cuenta? <a href="{% url 'login' %}" class="text-unphu">Inicia sesión aquí</a></p>
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="text-center">
+                    <p class="small text-muted mb-0">
+                        <i class="fas fa-info-circle me-1"></i> Solo usuarios con correo institucional (@unphu.edu.do) pueden registrarse
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard de Resultados - UniVote{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="mb-0"><i class="fas fa-tachometer-alt me-2 text-unphu"></i> Dashboard de Resultados</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm dashboard-stat">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-unphu me-3">
+                        <i class="fas fa-check-to-slot"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-1">Elecciones Finalizadas</h6>
+                        <h2 class="mb-0">{{ ended_elections.count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm dashboard-stat">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-success me-3">
+                        <i class="fas fa-vote-yea"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-1">Votos Totales</h6>
+                        <h2 class="mb-0">{{ total_votes }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm dashboard-stat">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-info me-3">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-1">Candidatos</h6>
+                        <h2 class="mb-0">{{ total_candidates }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm dashboard-stat">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-warning me-3">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-1">Próximas</h6>
+                        <h2 class="mb-0">{{ upcoming_elections.count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Elecciones finalizadas -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-unphu text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0"><i class="fas fa-flag-checkered me-2"></i> Elecciones Finalizadas</h2>
+        <span class="badge bg-light text-dark">{{ ended_elections.count }} elecciones</span>
+    </div>
+    <div class="card-body">
+        {% if ended_elections %}
+        <div class="table-responsive">
+            <table class="table table-hover dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Periodo</th>
+                        <th>Participación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for election in ended_elections %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="election-icon">
+                                        <i class="fas fa-award"></i>
+                                    </div>
+                                </div>
+                                <div class="ms-3">
+                                    <h6 class="mb-0">{{ election.title }}</h6>
+                                    <small class="text-muted">Finalizada: {{ election.end_date|timesince }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="small">
+                                <i class="far fa-calendar-plus text-muted me-1"></i> {{ election.start_date|date:"d/m/Y H:i" }}<br>
+                                <i class="far fa-calendar-check text-muted me-1"></i> {{ election.end_date|date:"d/m/Y H:i" }}
+                            </div>
+                        </td>
+                        <td>
+                            <!-- Aquí podríamos poner estadísticas de participación si las calculamos -->
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-unphu" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <small class="text-muted">{{ election.votes.count }} votos emitidos</small>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'election_results' election.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-chart-pie me-1"></i> Resultados
+                                </a>
+                                <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="visually-hidden">Exportar</span>
+                                </button>
+                                <ul class="dropdown-menu shadow">
+                                    <li><a class="dropdown-item" href="{% url 'election_results_pdf' election.id %}"><i class="fas fa-file-pdf me-2 text-danger"></i> PDF</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'election_results_export' election.id %}"><i class="fas fa-file-csv me-2 text-success"></i> CSV</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <div class="d-flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle fa-2x me-3"></i>
+                </div>
+                <div>
+                    <p class="mb-0">No hay elecciones finalizadas para mostrar.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Elecciones en curso -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0"><i class="fas fa-running me-2"></i> Elecciones en Curso</h2>
+        <span class="badge bg-light text-dark">{{ ongoing_elections.count }} activas</span>
+    </div>
+    <div class="card-body">
+        {% if ongoing_elections %}
+        <div class="table-responsive">
+            <table class="table table-hover dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Tiempo restante</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for election in ongoing_elections %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="election-icon active">
+                                        <i class="fas fa-vote-yea"></i>
+                                    </div>
+                                </div>
+                                <div class="ms-3">
+                                    <h6 class="mb-0">{{ election.title }}</h6>
+                                    <small class="text-muted">Creada por: {{ election.created_by.first_name }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="countdown">{{ election.end_date|timeuntil }}</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-success">En curso</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'election_results' election.id %}" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-chart-pie me-1"></i> Vista previa de resultados
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <div class="d-flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle fa-2x me-3"></i>
+                </div>
+                <div>
+                    <p class="mb-0">No hay elecciones en curso en este momento.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Próximas elecciones -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0"><i class="fas fa-hourglass-start me-2"></i> Próximas Elecciones</h2>
+        <span class="badge bg-light text-dark">{{ upcoming_elections.count }} programadas</span>
+    </div>
+    <div class="card-body">
+        {% if upcoming_elections %}
+        <div class="table-responsive">
+            <table class="table table-hover dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Inicia en</th>
+                        <th>Duración</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for election in upcoming_elections %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="election-icon upcoming">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                </div>
+                                <div class="ms-3">
+                                    <h6 class="mb-0">{{ election.title }}</h6>
+                                    <small class="text-muted">Creada por: {{ election.created_by.first_name }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="countdown">{{ election.start_date|timeuntil }}</div>
+                        </td>
+                        <td>
+                            {{ election.start_date|timesince:election.end_date }}
+                        </td>
+                        <td>
+                            <a href="{% url 'election_detail' election.id %}" class="btn btn-sm btn-outline-warning">
+                                <i class="fas fa-eye me-1"></i> Ver detalles
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <div class="d-flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle fa-2x me-3"></i>
+                </div>
+                <div>
+                    <p class="mb-0">No hay próximas elecciones programadas.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .dashboard-header {
+        padding: 20px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .dashboard-stat {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 22px;
+    }
+    
+    .dashboard-table th {
+        font-weight: 600;
+        color: #555;
+    }
+    
+    .election-icon {
+        width: 40px;
+        height: 40px;
+        background-color: #f0f0f0;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--unphu-green);
+    }
+    
+    .election-icon.active {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+    
+    .election-icon.upcoming {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+    
+    .countdown {
+        font-weight: 600;
+        color: #555;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if is_create %}Crear Nuevo Candidato{% else %}Editar Candidato{% endif %} - UniVote
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% if is_create %}{% url 'election_list' %}{% else %}{% url 'election_detail' candidate.election.id %}{% endif %}" class="btn btn-outline-unphu">
+        <i class="fas fa-arrow-left me-2"></i>Volver
+    </a>
+</div>
+
+<div class="card shadow">
+    <div class="card-header bg-unphu text-white">
+        <h3 class="mb-0">{% if is_create %}Crear Nuevo Candidato{% else %}Editar Candidato{% endif %}</h3>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form.election|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form.name|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.position|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form.photo|as_crispy_field }}
+                    {% if not is_create and candidate.photo %}
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Foto actual:</strong></p>
+                        <img src="{{ candidate.photo.url }}" alt="{{ candidate.name }}" class="img-thumbnail" style="max-height: 150px;">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form.bio|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-unphu">
+                    {% if is_create %}Crear Candidato{% else %}Guardar Cambios{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

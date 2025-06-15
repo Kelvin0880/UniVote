@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load election_extras %}
+
+{% block title %}Votar - {{ election.title }} - UniVote{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'election_detail' election.id %}" class="btn btn-outline-unphu">
+        <i class="fas fa-arrow-left me-2"></i>Volver a la elección
+    </a>
+</div>
+
+<div class="card shadow">
+    <div class="card-header bg-unphu text-white">
+        <h3 class="mb-0">Emitir voto: {{ election.title }}</h3>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info mb-4">
+            <p class="mb-0"><i class="fas fa-info-circle me-2"></i> Tu voto es anónimo y seguro. Una vez emitido no podrás cambiarlo.</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <h4 class="mb-3">Selecciona tu candidato:</h4>
+            
+            <div class="candidates-grid mb-4">
+                {% for radio in form.candidate %}
+                <div class="candidate-option">
+                    <label for="{{ radio.id_for_label }}" class="candidate-label">
+                        <div class="form-check">
+                            {{ radio.tag }}
+                            <strong>{{ radio.choice_label }}</strong>
+                        </div>
+                        
+                        {% with candidate=form.fields.candidate.queryset|get_item:forloop.counter0 %}
+                            <div class="candidate-details">
+                                {% if candidate.photo %}
+                                <img src="{{ candidate.photo.url }}" alt="{{ candidate.name }}" class="candidate-thumbnail">
+                                {% endif %}
+                                <div>
+                                    <p class="candidate-position">{{ candidate.position }}</p>
+                                    {% if candidate.bio %}
+                                    <p class="candidate-bio text-muted small">{{ candidate.bio|truncatechars:100 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endwith %}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-unphu btn-lg">
+                    <i class="fas fa-vote-yea me-2"></i>Confirmar voto
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .candidates-grid {
+        display: grid;
+        gap: 15px;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+    
+    .candidate-option {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .candidate-option:hover {
+        border-color: var(--unphu-green);
+        background-color: #f8f9fa;
+        transform: translateY(-5px);
+    }
+    
+    .candidate-label {
+        display: block;
+        cursor: pointer;
+        margin-bottom: 0;
+    }
+    
+    .candidate-details {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .candidate-thumbnail {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+    
+    .candidate-position {
+        margin-bottom: 5px;
+        font-style: italic;
+    }
+    
+    input[type="radio"]:checked + strong {
+        color: var(--unphu-green);
+    }
+    
+    input[type="radio"]:checked ~ .candidate-details {
+        font-weight: 500;
+    }
+</style>
+
+{% endblock %}
