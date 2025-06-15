@@ -78,12 +78,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'univote.wsgi.application'
 
-# Database - Configuración mejorada
-if 'DATABASE_URL' in os.environ:
-    DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
-    }
+# Database - Configuración mejorada con validación
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    try:
+        DATABASES = {
+            'default': dj_database_url.parse(DATABASE_URL)
+        }
+    except ValueError as e:
+        print(f"Error parsing DATABASE_URL: {e}")
+        # Fallback a configuración local para desarrollo
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.mysql',
+                'NAME': 'univote_db',
+                'USER': 'root',
+                'PASSWORD': 'Kjpg0880',
+                'HOST': 'localhost',
+                'PORT': '3306',
+            }
+        }
 else:
+    # Configuración local para desarrollo
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
